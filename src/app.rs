@@ -1,3 +1,5 @@
+use egui_extras::{TableBuilder,Size};
+
 /// We derive Deserialize/Serialize so we can persist app state on shutdown.
 #[derive(serde::Deserialize, serde::Serialize)]
 #[serde(default)] // if we add new fields, give them default values when deserializing old state
@@ -10,11 +12,24 @@ pub struct TemplateApp {
     value: f32,
 }
 
+struct Character{
+    name: String,
+    race: String,
+    class: String,
+    alignment: String,
+}
+
+impl Default for Character{
+    fn default() -> Self {
+        Self { name: "".to_string(), race: "".to_string(), class: "".to_string(), alignment: "".to_string() }
+    }
+}
+
 impl Default for TemplateApp {
     fn default() -> Self {
         Self {
             // Example stuff:
-            label: "Hello World!".to_owned(),
+            label: "".to_owned(),
             value: 2.7,
         }
     }
@@ -63,40 +78,104 @@ impl eframe::App for TemplateApp {
             });
         });
 
-        egui::SidePanel::left("side_panel").show(ctx, |ui| {
-            ui.heading("Side Panel");
+        // egui::SidePanel::left("side_panel").show(ctx, |ui| {
+        //     ui.heading("Side Panel");
 
-            ui.horizontal(|ui| {
-                ui.label("Write something: ");
-                ui.text_edit_singleline(label);
-            });
+        //     ui.horizontal(|ui| {
+        //         ui.label("Write something: ");
+        //         ui.text_edit_singleline(label);
+        //     });
 
-            ui.add(egui::Slider::new(value, 0.0..=10.0).text("value"));
-            if ui.button("Increment").clicked() {
-                *value += 1.0;
-            }
+        //     ui.add(egui::Slider::new(value, 0.0..=10.0).text("value"));
+        //     if ui.button("Increment").clicked() {
+        //         *value += 1.0;
+        //     }
 
-            ui.with_layout(egui::Layout::bottom_up(egui::Align::LEFT), |ui| {
-                ui.horizontal(|ui| {
-                    ui.spacing_mut().item_spacing.x = 0.0;
-                    ui.label("powered by ");
-                    ui.hyperlink_to("egui", "https://github.com/emilk/egui");
-                    ui.label(" and ");
-                    ui.hyperlink_to("eframe", "https://github.com/emilk/egui/tree/master/eframe");
-                });
-            });
-        });
+        //     ui.with_layout(egui::Layout::bottom_up(egui::Align::LEFT), |ui| {
+        //         ui.horizontal(|ui| {
+        //             ui.spacing_mut().item_spacing.x = 0.0;
+        //             ui.label("powered by ");
+        //             ui.hyperlink_to("egui", "https://github.com/emilk/egui");
+        //             ui.label(" and ");
+        //             ui.hyperlink_to("eframe", "https://github.com/emilk/egui/tree/master/eframe");
+        //         });
+        //     });
+        // });
 
         egui::CentralPanel::default().show(ctx, |ui| {
             // The central panel the region left after adding TopPanel's and SidePanel's
 
-            ui.heading("eframe template");
-            ui.hyperlink("https://github.com/emilk/eframe_template");
-            ui.add(egui::github_link_file!(
-                "https://github.com/emilk/eframe_template/blob/master/",
-                "Source code."
-            ));
-            egui::warn_if_debug_build(ui);
+            let table = TableBuilder::new(ui)
+            .striped(true)
+            .columns(Size::initial(50.0), 5)
+            .resizable(true)
+            .header(20.0 , |mut header|{
+                header.col(|ui|{
+                    ui.heading("Name");
+                });
+                header.col(|ui|{
+                    ui.heading("Race");
+                });
+                header.col(|ui|{
+                    ui.heading("Class");
+                });
+                header.col(|ui|{
+                    ui.heading("Alignment");
+                });
+                header.col(|ui|{
+                    ui.heading("Stats");
+                });
+            })
+            .body(|mut body|{
+                body.row(30.0, |mut row| {
+                    let char = Character {
+                        name: String::from("tank").to_owned(),
+                        race: String::from("human"),
+                        class: String::from("fighter"),
+                        alignment: String::from("dog"),
+                    };
+                    row.col(|ui|{
+                        let mut name = char.name.to_owned();
+                        ui.text_edit_singleline(&mut name);
+                    });
+                    row.col(|ui| {
+                        ui.label("fafaf");
+                        ui.text_edit_singleline(label);
+                    });
+                    row.col(|ui| {
+                        ui.label("");
+                        ui.text_edit_singleline(label);
+                    });
+                    row.col(|ui| {
+                        ui.label("");
+                        ui.text_edit_singleline(label);
+                    });
+                    row.col(|ui| {
+                        ui.label("");
+                        ui.text_edit_singleline(label);
+                    });
+                })
+            });
+            // .column(Size::exact(50.0))
+            // .header(20.0, |mut header| {
+            //     header.col(|ui| {
+            //         ui.heading("Growing");
+            //     });
+            //     header.col(|ui| {
+            //         ui.heading("Fixed");
+            //     });
+            // });
+            // table.body(body)
+            // .body(|mut body| {
+            //     body.row(30.0, |mut row| {
+            //         row.col(|ui| {
+            //             ui.label("first row growing cell");
+            //         });
+            //         row.col(|ui| {
+            //             ui.button("action");
+            //         });
+            //     });
+            // });
         });
 
         if false {
